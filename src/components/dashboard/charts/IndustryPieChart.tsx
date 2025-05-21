@@ -3,12 +3,16 @@ import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import type { Company } from "../../../types/company";
 import { Card, CardHeader, CardContent } from "../../ui/Card";
 import { ChartConfig, ChartContainer, ChartTooltipContent } from "../../ui/Chart";
+import { cn } from "../../../utils/cn";
+import { ChartSkeleton } from "../../ui/Skeleton";
 
 interface IndustryPieChartProps {
-  /** Array of company data */
+  /** Array of companies to visualize */
   companies: Company[];
-  /** Chart title */
+  /** Optional title for the chart */
   title?: string;
+  /** Loading state */
+  isLoading?: boolean;
   /** Additional CSS classes */
   className?: string;
 }
@@ -18,9 +22,19 @@ interface IndustryPieChartProps {
  */
 export function IndustryPieChart({
   companies,
-  title = "Companies by Industry",
+  title = "Industry Distribution",
+  isLoading,
   className,
 }: IndustryPieChartProps) {
+  // Skip processing if loading
+  if (isLoading) {
+    return (
+      <Card className={cn("h-[300px] flex flex-col", className)}>
+        <ChartSkeleton />
+      </Card>
+    );
+  }
+
   // Generate chart data and config
   const { data, chartConfig } = useMemo(() => {
     // Count companies by industry
@@ -99,6 +113,10 @@ export function IndustryPieChart({
                   stroke="var(--background)"
                   label={false}
                   labelLine={false}
+                  animationBegin={100}
+                  animationDuration={1000}
+                  animationEasing="ease-out"
+                  isAnimationActive={true}
                 >
                   {data.map((entry, index) => (
                     <Cell 
@@ -110,9 +128,9 @@ export function IndustryPieChart({
                 <Tooltip
                   content={<ChartTooltipContent />}
                   wrapperStyle={{ outline: 'none' }}
-                  formatter={(value, name) => {
+                  formatter={(value: number, name: string) => {
                     return [
-                      `${value} (${Math.round((Number(value) / companies.length) * 100)}%)`,
+                      `${value} (${Math.round((value / companies.length) * 100)}%)`,
                       name
                     ];
                   }}

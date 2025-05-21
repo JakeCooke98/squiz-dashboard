@@ -3,35 +3,51 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import type { Company } from "../../../types/company";
 import { Card, CardHeader, CardContent } from "../../ui/Card";
 import { ChartConfig, ChartContainer, ChartTooltipContent } from "../../ui/Chart";
+import { ChartSkeleton } from "../../ui/Skeleton";
+import { cn } from "../../../utils/cn";
 
 interface EmployeeChartProps {
-  /** Array of company data */
+  /** Array of companies to visualize */
   companies: Company[];
-  /** Chart title */
+  /** Optional title for the chart */
   title?: string;
+  /** Maximum number of companies to display */
+  limit?: number;
+  /** Loading state */
+  isLoading?: boolean;
   /** Additional CSS classes */
   className?: string;
 }
 
 /**
- * Vertical bar chart showing companies by employee count
+ * Bar chart showing companies by employee count
  */
-export function EmployeeChart({
-  companies,
-  title = "Top Companies by Employees",
-  className,
+export function EmployeeChart({ 
+  companies, 
+  title = "Top Companies by Employee Count",
+  isLoading,
+  className 
 }: EmployeeChartProps) {
+  // Skip processing if loading
+  if (isLoading) {
+    return (
+      <Card className={cn("h-[300px] flex flex-col", className)}>
+        <ChartSkeleton />
+      </Card>
+    );
+  }
+
   // Generate chart data and config
   const { data, chartConfig } = useMemo(() => {
     // Sort companies by employee count and take top 10
     const topCompanies = [...companies]
-      .sort((a, b) => b.numberOfEmployees - a.numberOfEmployees)
+      .sort((a, b) => b.employees - a.employees)
       .slice(0, 10);
     
     // Format data for the chart
     const chartData = topCompanies.map(company => ({
       name: company.name,
-      employees: company.numberOfEmployees,
+      employees: company.employees,
     }));
     
     // Create config for the chart
@@ -72,7 +88,7 @@ export function EmployeeChart({
           <ChartContainer config={chartConfig} className="flex-1">
             <BarChart
               data={data}
-              margin={{ top: 5, right: 10, left: 10, bottom: 20 }}
+              margin={{ top: 5, right: 10, left: 10, bottom: 40 }}
             >
               <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="var(--border)" />
               <XAxis 
@@ -103,6 +119,9 @@ export function EmployeeChart({
                 radius={[4, 4, 0, 0]}
                 barSize={26}
                 animationDuration={1000}
+                animationBegin={300}
+                animationEasing="ease-out"
+                isAnimationActive={true}
               />
             </BarChart>
           </ChartContainer>

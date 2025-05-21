@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Company, FilterState } from '../../types/company';
 import { cn } from '../../utils/cn';
+import { TableSkeleton } from '../ui/Skeleton';
 
 interface DataTableProps {
   /** Array of companies to display */
@@ -9,6 +10,8 @@ interface DataTableProps {
   filterState: FilterState;
   /** Called when a column header is clicked for sorting */
   onSort: (field: keyof Company) => void;
+  /** Loading state */
+  isLoading?: boolean;
   /** Additional CSS classes */
   className?: string;
 }
@@ -21,6 +24,7 @@ export function DataTable({
   data,
   filterState,
   onSort,
+  isLoading,
   className,
 }: DataTableProps) {
   // Pagination state
@@ -76,7 +80,7 @@ export function DataTable({
    */
   const SortableHeader = ({ field, label }: { field: keyof Company; label: string }) => (
     <th 
-      className="p-4 text-left font-medium text-sm cursor-pointer hover:bg-muted/50"
+      className="p-4 text-left font-medium text-sm cursor-pointer hover:bg-muted/50 transition-colors"
       onClick={() => onSort(field)}
     >
       <div className="flex items-center">
@@ -86,8 +90,17 @@ export function DataTable({
     </th>
   );
 
+  // Show loading state if needed
+  if (isLoading) {
+    return (
+      <div className={cn('border rounded-lg overflow-hidden', className)}>
+        <TableSkeleton rows={itemsPerPage} />
+      </div>
+    );
+  }
+
   return (
-    <div className={cn('border rounded-lg overflow-hidden', className)}>
+    <div className={cn('border rounded-lg overflow-hidden slide-up', className)}>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-muted/50 border-b">
@@ -95,10 +108,10 @@ export function DataTable({
               <SortableHeader field="name" label="Company Name" />
               <SortableHeader field="industry" label="Industry" />
               <SortableHeader field="country" label="Country" />
-              <SortableHeader field="numberOfEmployees" label="Employees" />
+              <SortableHeader field="employees" label="Employees" />
             </tr>
           </thead>
-          <tbody>
+          <tbody className="stagger-container">
             {paginatedData.length === 0 ? (
               <tr>
                 <td colSpan={4} className="p-4 text-center">
@@ -106,12 +119,16 @@ export function DataTable({
                 </td>
               </tr>
             ) : (
-              paginatedData.map((company) => (
-                <tr key={company.id} className="border-b last:border-b-0 hover:bg-muted/50">
+              paginatedData.map((company, idx) => (
+                <tr 
+                  key={company.id} 
+                  className="border-b last:border-b-0 hover:bg-muted/50 transition-colors stagger-item"
+                  style={{animationDelay: `${idx * 50}ms`}}
+                >
                   <td className="p-4 font-medium">{company.name}</td>
                   <td className="p-4">{company.industry}</td>
                   <td className="p-4">{company.country}</td>
-                  <td className="p-4">{company.numberOfEmployees}</td>
+                  <td className="p-4">{company.employees.toLocaleString()}</td>
                 </tr>
               ))
             )}
@@ -128,14 +145,14 @@ export function DataTable({
           </div>
           <div className="flex space-x-1">
             <button
-              className="px-2 py-1 rounded hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 rounded transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
             >
               Previous
             </button>
             <button
-              className="px-2 py-1 rounded hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 rounded transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
             >

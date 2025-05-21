@@ -23,10 +23,12 @@ export async function fetchCompanies(): Promise<CompaniesResponse> {
       throw error;
     }
 
-    const data = await response.json();
+    const companies = await response.json();
+    
+    // API returns an array of companies directly, so we need to wrap it
     return {
-      companies: data,
-      total: data.length,
+      companies: Array.isArray(companies) ? companies : [],
+      total: Array.isArray(companies) ? companies.length : 0,
     };
   } catch (error) {
     // Handle network errors or other exceptions

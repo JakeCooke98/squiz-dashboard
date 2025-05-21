@@ -3,24 +3,38 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import type { Company } from "../../../types/company";
 import { Card, CardHeader, CardContent } from "../../ui/Card";
 import { ChartConfig, ChartContainer, ChartTooltipContent } from "../../ui/Chart";
+import { cn } from "../../../utils/cn";
+import { ChartSkeleton } from "../../ui/Skeleton";
 
 interface CountryChartProps {
-  /** Array of company data */
+  /** Array of companies to visualize */
   companies: Company[];
-  /** Chart title */
+  /** Optional chart title */
   title?: string;
+  /** Loading state */
+  isLoading?: boolean;
   /** Additional CSS classes */
   className?: string;
 }
 
 /**
- * Horizontal bar chart showing distribution of companies by country
+ * Bar chart showing distribution of companies by country
  */
-export function CountryChart({
-  companies,
-  title = "Companies by Country",
-  className,
+export function CountryChart({ 
+  companies, 
+  title = "Country Distribution",
+  isLoading,
+  className 
 }: CountryChartProps) {
+  // Skip processing if loading
+  if (isLoading) {
+    return (
+      <Card className={cn("h-[300px] flex flex-col", className)}>
+        <ChartSkeleton />
+      </Card>
+    );
+  }
+
   // Generate chart data and config
   const { data, chartConfig } = useMemo(() => {
     // Count companies by country
@@ -103,6 +117,9 @@ export function CountryChart({
                 radius={[0, 4, 4, 0]}
                 barSize={20}
                 animationDuration={800}
+                animationBegin={200}
+                animationEasing="ease-in-out"
+                isAnimationActive={true}
               />
             </BarChart>
           </ChartContainer>

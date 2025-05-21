@@ -7,15 +7,13 @@ export interface Company {
   /** Company name */
   name: string;
   /** Number of employees */
-  numberOfEmployees: number;
+  employees: number;
+  /** Number of employees (legacy field) */
+  numberOfEmployees?: number;
   /** Company industry */
   industry: string;
   /** Company country */
   country: string;
-  /** Company website URL */
-  website: string;
-  /** Company description */
-  description: string;
 }
 
 /**
