@@ -64,10 +64,19 @@ export function IndustryPieChart({
     
     // Create config for the chart with colors
     const config: ChartConfig = {};
+    const colors = [
+      'hsl(var(--chart-1))',
+      'hsl(var(--chart-2))',
+      'hsl(var(--chart-3))',
+      'hsl(var(--chart-4))',
+      'hsl(var(--chart-5))',
+    ];
+    
     finalData.forEach((item, index) => {
+      const colorIndex = index % colors.length;
       config[item.name] = {
         label: item.name,
-        color: `hsl(var(--chart-${(index % 5) + 1}))`,
+        color: colors[colorIndex],
       };
     });
     
@@ -117,22 +126,27 @@ export function IndustryPieChart({
                   animationDuration={1000}
                   animationEasing="ease-out"
                   isAnimationActive={true}
+                  onClick={() => {}}
+                  style={{ cursor: "default" }}
                 >
-                  {data.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={`hsl(var(--chart-${(index % 5) + 1}))`}
-                    />
-                  ))}
+                  {data.map((entry, index) => {
+                    const colorIndex = index % 5;
+                    const color = `hsl(var(--chart-${colorIndex + 1}))`;
+                    return (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={color}
+                        stroke="var(--background)"
+                        strokeWidth={2}
+                      />
+                    );
+                  })}
                 </Pie>
                 <Tooltip
                   content={<ChartTooltipContent />}
                   wrapperStyle={{ outline: 'none' }}
                   formatter={(value: number, name: string) => {
-                    return [
-                      `${value} (${Math.round((value / companies.length) * 100)}%)`,
-                      name
-                    ];
+                    return value;
                   }}
                 />
               </PieChart>
@@ -141,15 +155,19 @@ export function IndustryPieChart({
           
           {/* Legend for identifying sections */}
           <div className="mt-auto grid grid-cols-3 gap-x-2 gap-y-0.5">
-            {data.map((entry, index) => (
-              <div key={`legend-${index}`} className="flex items-center">
-                <div 
-                  className="h-2.5 w-2.5 rounded-sm mr-1.5 flex-shrink-0" 
-                  style={{ backgroundColor: `hsl(var(--chart-${(index % 5) + 1}))` }}
-                />
-                <span className="text-xs font-medium truncate">{entry.name}</span>
-              </div>
-            ))}
+            {data.map((entry, index) => {
+              const colorIndex = index % 5;
+              const color = `hsl(var(--chart-${colorIndex + 1}))`;
+              return (
+                <div key={`legend-${index}`} className="flex items-center">
+                  <div 
+                    className="h-2.5 w-2.5 rounded-sm mr-1.5 flex-shrink-0" 
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="text-xs font-medium truncate">{entry.name}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </CardContent>

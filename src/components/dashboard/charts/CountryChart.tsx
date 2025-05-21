@@ -47,13 +47,13 @@ export function CountryChart({
     
     // Convert to chart data format and sort
     const chartData = Object.entries(countryCounts)
-      .map(([country, count]) => ({ country, count }))
-      .sort((a, b) => b.count - a.count)
+      .map(([country, count]) => ({ name: country, value: count }))
+      .sort((a, b) => b.value - a.value)
       .slice(0, 8); // Limit to top 8 countries
     
     // Create config for the chart
     const config: ChartConfig = {
-      count: {
+      value: {
         label: "Number of Companies",
         color: `hsl(var(--chart-2))`,
       },
@@ -91,34 +91,41 @@ export function CountryChart({
               data={data}
               layout="vertical"
               margin={{ top: 5, right: 25, left: 25, bottom: 5 }}
+              barGap={8}
+              className="hover:cursor-default"
             >
-              <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={true} stroke="var(--border)" />
+              <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--border)" />
               <XAxis 
-                type="number" 
+                type="number"
                 axisLine={{ stroke: "var(--border)" }}
                 tickLine={true}
                 tickMargin={5}
-                tick={{ fontSize: 11 }}
+                tick={{ fontSize: 12 }}
                 domain={[0, 'dataMax']}
               />
               <YAxis 
-                dataKey="country" 
-                type="category" 
+                type="category"
+                dataKey="name"
+                axisLine={{ stroke: "var(--border)" }}
+                tickLine={false}
+                tickMargin={5}
                 tick={{ fontSize: 12 }}
                 width={50}
-                axisLine={{ stroke: "var(--border)" }}
-                tickLine={true}
-                tickMargin={5}
               />
-              <Tooltip content={<ChartTooltipContent />} />
+              <Tooltip
+                content={<ChartTooltipContent />}
+                cursor={{ fill: 'var(--muted)', opacity: 0.1 }}
+                wrapperStyle={{ outline: 'none' }}
+              />
               <Bar 
-                dataKey="count" 
-                fill="var(--color-count)" 
+                dataKey="value" 
+                fill="var(--color-value)"
                 radius={[0, 4, 4, 0]}
-                barSize={20}
-                animationDuration={800}
+                barSize={26}
+                onClick={() => {}}
+                animationDuration={1000}
                 animationBegin={200}
-                animationEasing="ease-in-out"
+                animationEasing="ease-out"
                 isAnimationActive={true}
               />
             </BarChart>

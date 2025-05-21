@@ -94,4 +94,14 @@
 .hover-lift:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Disable selection for chart elements */
+.recharts-sector {
+  outline: none !important;
+}
+
+/* Prevent focus rings on chart elements */
+.recharts-wrapper *:focus {
+  outline: none !important;
 } 

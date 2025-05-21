@@ -57,7 +57,7 @@ export function ChartContainer({
     <ChartContext.Provider value={{ config }}>
       <div className={cn("w-full h-full", className)} style={style}>
         <ResponsiveContainer width="100%" height="100%">
-          {children}
+          {children as React.ReactElement}
         </ResponsiveContainer>
       </div>
     </ChartContext.Provider>
@@ -75,6 +75,7 @@ interface ChartTooltipContentProps {
     dataKey: string;
     color?: string;
     payload?: Record<string, any>;
+    formatter?: (value: number, name: string) => [string, string];
   }>;
   label?: string;
   className?: string;
@@ -83,45 +84,34 @@ interface ChartTooltipContentProps {
 export function ChartTooltipContent({
   active,
   payload,
-  label,
-  className,
 }: ChartTooltipContentProps) {
   const { config } = useChartContext();
   
-  if (!active || !payload || payload.length === 0) {
+  if (!active || !payload || !payload.length) {
     return null;
   }
-
+  
+  const data = payload[0];
+  const dataKey = data.dataKey;
+  const name = data.name;
+  const value = data.value;
+  const color = data.color || (config[name]?.color || config[dataKey]?.color || 'hsl(var(--primary))');
+  
   return (
-    <div className={cn("rounded-lg border bg-card p-3 shadow-md animate-in fade-in-50 zoom-in-95", className)}>
-      {label && (
-        <div className="mb-2 font-medium text-card-foreground">
-          {label}
+    <div className="bg-popover/95 shadow-md rounded-md border px-3 py-1.5 text-sm animate-in fade-in-50 duration-100">
+      {name && (
+        <div className="flex items-center mb-1">
+          <div 
+            className="w-2 h-2 rounded-sm mr-1.5" 
+            style={{ backgroundColor: color }}
+          />
+          <span className="font-medium">
+            {config[name]?.label || name}
+          </span>
         </div>
       )}
-      <div className="flex flex-col gap-2">
-        {payload.map((entry, index) => {
-          const dataKey = entry.dataKey;
-          const itemConfig = config[dataKey] || {};
-          const color = entry.color || itemConfig.color || `hsl(var(--chart-${index + 1}))`;
-          
-          return (
-            <div key={`item-${index}`} className="flex items-center">
-              <div
-                className="h-3 w-3 rounded-sm mr-2.5"
-                style={{ backgroundColor: color }}
-              />
-              <span className="font-medium text-sm">
-                {itemConfig.label || entry.name}:
-              </span>
-              <span className="ml-1.5 text-sm text-muted-foreground font-medium">
-                {typeof entry.value === 'number' 
-                  ? entry.value.toLocaleString() 
-                  : entry.value}
-              </span>
-            </div>
-          );
-        })}
+      <div>
+        {value}
       </div>
     </div>
   );

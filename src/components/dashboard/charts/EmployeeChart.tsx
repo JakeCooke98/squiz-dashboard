@@ -89,6 +89,7 @@ export function EmployeeChart({
             <BarChart
               data={data}
               margin={{ top: 5, right: 10, left: 10, bottom: 40 }}
+              className="hover:cursor-default"
             >
               <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="var(--border)" />
               <XAxis 
@@ -112,12 +113,17 @@ export function EmployeeChart({
                 tick={{ fontSize: 11 }}
                 domain={[0, 'dataMax']}
               />
-              <Tooltip content={<ChartTooltipContent />} />
+              <Tooltip 
+                content={<ChartTooltipContent />} 
+                cursor={{ fill: 'var(--muted)', opacity: 0.1 }}
+                wrapperStyle={{ outline: 'none' }}
+              />
               <Bar 
                 dataKey="employees" 
                 fill="var(--color-employees)" 
                 radius={[4, 4, 0, 0]}
                 barSize={26}
+                onClick={() => {}}
                 animationDuration={1000}
                 animationBegin={300}
                 animationEasing="ease-out"
