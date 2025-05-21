@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Dashboard } from './components/dashboard/Dashboard';
 
-// Create a client
+// Create a client with 5 minute stale time
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -20,14 +20,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto px-4 py-8">
-          <h1 className="text-4xl font-bold text-foreground mb-8">
-            Company Dashboard
-          </h1>
-          {/* Dashboard content will be added here */}
-        </main>
+        <header className="bg-primary text-primary-foreground px-6 py-4 shadow-sm">
+          <h1 className="text-2xl font-bold">Company Dashboard</h1>
+        </header>
+        <Dashboard />
       </div>
-      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }
