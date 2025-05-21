@@ -6,6 +6,9 @@ import { FilterPanel } from './FilterPanel';
 import { DataTable } from './DataTable';
 import { StatsCard } from './StatsCard';
 import { Card } from '../ui/Card';
+import { IndustryPieChart } from './charts/IndustryPieChart';
+import { CountryChart } from './charts/CountryChart';
+import { EmployeeChart } from './charts/EmployeeChart';
 
 /**
  * Main dashboard component that integrates all dashboard elements
@@ -151,6 +154,15 @@ export function Dashboard() {
             />
           )}
         </div>
+
+        {/* Charts row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <IndustryPieChart companies={data.companies} />
+          <CountryChart companies={data.companies} />
+        </div>
+
+        {/* Employee chart */}
+        <EmployeeChart companies={data.companies} />
 
         {/* Data table */}
         <Card className="p-0">
