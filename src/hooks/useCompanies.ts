@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchCompanies } from '../services/api';
-import type { Company, FilterState } from '../types/company';
+import type { FilterState } from '../types/company';
 import { useMemo } from 'react';
 
 /**
