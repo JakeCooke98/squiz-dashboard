@@ -26,6 +26,9 @@ const PAGE_SIZE_KEY = 'dashboard_pageSize';
  */
 function getStoredPageSize(): number {
   try {
+    // Check if window exists (to prevent server-side rendering errors)
+    if (typeof window === 'undefined') return 10;
+    
     const stored = localStorage.getItem(PAGE_SIZE_KEY);
     const parsedSize = stored ? parseInt(stored, 10) : 10;
     return PAGE_SIZE_OPTIONS.includes(parsedSize) ? parsedSize : 10;
@@ -39,6 +42,9 @@ function getStoredPageSize(): number {
  */
 function savePageSize(size: number): void {
   try {
+    // Check if window exists (to prevent server-side rendering errors)
+    if (typeof window === 'undefined') return;
+    
     localStorage.setItem(PAGE_SIZE_KEY, size.toString());
   } catch (error) {
     console.error('Failed to save page size', error);
