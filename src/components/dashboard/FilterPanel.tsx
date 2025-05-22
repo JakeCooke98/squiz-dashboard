@@ -70,11 +70,11 @@ export function FilterPanel({
 
       {/* Search filter */}
       <div className="space-y-2">
-        <Label htmlFor="search">Search by Name</Label>
+        <Label htmlFor="search">Search by Company Name</Label>
         <Input
           id="search"
           type="text"
-          placeholder="Search companies..."
+          placeholder="Search companies by name..."
           value={searchInput}
           onChange={e => setSearchInput(e.target.value)}
         />
@@ -134,7 +134,7 @@ export function FilterPanel({
           onValueChange={value => {
             if (value === 'none') {
               updateFilter('sortBy', null);
-            } else if (value === 'name' || value === 'numberOfEmployees') {
+            } else if (value === 'name' || value === 'employees') {
               updateFilter('sortBy', value);
             }
           }}
@@ -145,7 +145,7 @@ export function FilterPanel({
           <SelectContent>
             <SelectItem value="none">No Sorting</SelectItem>
             <SelectItem value="name">Company Name</SelectItem>
-            <SelectItem value="numberOfEmployees">Number of Employees</SelectItem>
+            <SelectItem value="employees">Number of Employees</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -75,14 +75,10 @@ export function useCompanies(filters: FilterState): UseCompaniesResult {
         return false;
       }
       
-      // Filter by search term
+      // Filter by search term - only search in company name
       if (filters.searchTerm) {
         const searchTerm = filters.searchTerm.toLowerCase();
-        const nameMatch = company.name.toLowerCase().includes(searchTerm);
-        const industryMatch = company.industry.toLowerCase().includes(searchTerm);
-        const countryMatch = company.country.toLowerCase().includes(searchTerm);
-        
-        return nameMatch || industryMatch || countryMatch;
+        return company.name.toLowerCase().includes(searchTerm);
       }
       
       return true;
