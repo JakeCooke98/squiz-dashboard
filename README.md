@@ -17,7 +17,6 @@ An interactive dashboard built with React, TypeScript, and modern web technologi
 - TypeScript
 - Vite
 - Tailwind CSS
-- shadcn/ui
 - React Query
 - Recharts
 - Jest + React Testing Library
@@ -35,27 +34,19 @@ An interactive dashboard built with React, TypeScript, and modern web technologi
    ```
 4. Run tests:
    ```bash
-   npm test
+   npm run test:coverage
    ```
 
 ## Project Structure
 
 ```
 src/
-├── components/     # Reusable UI components
+├── components/    # Reusable UI components
 ├── hooks/         # Custom React hooks
 ├── services/      # API and data services
+├── styles/        # Styling
 ├── types/         # TypeScript type definitions
 ├── utils/         # Utility functions
 └── __tests__/     # Test files
 ```
-
-## Development Guidelines
-
-- Follow TypeScript best practices
-- Write tests for all components and hooks
-- Use functional components with hooks
-- Implement responsive design with Tailwind CSS
-- Follow the component structure guidelines
-- Maintain clean and documented code
 
