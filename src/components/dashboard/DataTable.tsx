@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Company, FilterState } from '../../types/company';
 import { cn } from '../../utils/cn';
 import { TableSkeleton } from '../ui/Skeleton';
@@ -16,6 +16,35 @@ interface DataTableProps {
   className?: string;
 }
 
+// Possible page size options
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+// Key for storing page size in localStorage
+const PAGE_SIZE_KEY = 'dashboard_pageSize';
+
+/**
+ * Get the page size from localStorage or use the default
+ */
+function getStoredPageSize(): number {
+  try {
+    const stored = localStorage.getItem(PAGE_SIZE_KEY);
+    const parsedSize = stored ? parseInt(stored, 10) : 10;
+    return PAGE_SIZE_OPTIONS.includes(parsedSize) ? parsedSize : 10;
+  } catch {
+    return 10;
+  }
+}
+
+/**
+ * Save page size to localStorage
+ */
+function savePageSize(size: number): void {
+  try {
+    localStorage.setItem(PAGE_SIZE_KEY, size.toString());
+  } catch (error) {
+    console.error('Failed to save page size', error);
+  }
+}
+
 /**
  * Component to display company data in a table format
  * Supports sorting and pagination
@@ -29,13 +58,26 @@ export function DataTable({
 }: DataTableProps) {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const [pageSize, setPageSize] = useState(getStoredPageSize());
+  const totalPages = Math.ceil(data.length / pageSize);
+  
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterState]);
+
+  // Save page size when it changes
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    savePageSize(newSize);
+    // Reset to page 1 when changing page size to avoid empty results
+    setCurrentPage(1);
+  };
   
   // Paginated data
   const paginatedData = data.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
   );
 
   /**
@@ -94,7 +136,7 @@ export function DataTable({
   if (isLoading) {
     return (
       <div className={cn('border rounded-lg overflow-hidden', className)}>
-        <TableSkeleton rows={itemsPerPage} />
+        <TableSkeleton rows={pageSize} />
       </div>
     );
   }
@@ -137,28 +179,78 @@ export function DataTable({
       </div>
 
       {/* Pagination controls */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border-t">
+      {data.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 border-t gap-4">
           <div className="text-sm text-muted-foreground">
-            Showing {(currentPage - 1) * itemsPerPage + 1}-
-            {Math.min(currentPage * itemsPerPage, data.length)} of {data.length}
+            Showing {data.length > 0 ? (currentPage - 1) * pageSize + 1 : 0}-
+            {Math.min(currentPage * pageSize, data.length)} of {data.length}
           </div>
-          <div className="flex space-x-1">
-            <button
-              className="px-3 py-1.5 rounded transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
+          
+          {/* Page size selector */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Rows per page:</span>
+            <select
+              className="h-8 w-16 rounded border bg-background px-2 text-sm"
+              value={pageSize}
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+              aria-label="Items per page"
             >
-              Previous
-            </button>
-            <button
-              className="px-3 py-1.5 rounded transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
+              {PAGE_SIZE_OPTIONS.map(size => (
+                <option key={size} value={size}>{size}</option>
+              ))}
+            </select>
           </div>
+          
+          {/* Page navigation */}
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1">
+              <button
+                className="p-2 rounded transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+                aria-label="First page"
+              >
+                <span className="sr-only">First page</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="11 17 6 12 11 7"></polyline>
+                  <polyline points="18 17 13 12 18 7"></polyline>
+                </svg>
+              </button>
+              
+              <button
+                className="px-3 py-1.5 rounded transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              
+              <span className="mx-2 text-sm">
+                Page {currentPage} of {totalPages}
+              </span>
+              
+              <button
+                className="px-3 py-1.5 rounded transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+              
+              <button
+                className="p-2 rounded transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+                aria-label="Last page"
+              >
+                <span className="sr-only">Last page</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="13 17 18 12 13 7"></polyline>
+                  <polyline points="6 17 11 12 6 7"></polyline>
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -104,4 +104,28 @@
 /* Prevent focus rings on chart elements */
 .recharts-wrapper *:focus {
   outline: none !important;
+}
+
+/* 
+ * Select Dropdown Enhancements
+ * Ensures consistent dropdown behavior and modern styling
+ */
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Add subtle entrance animation */
+[data-radix-select-content] {
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+/* Ensure smooth scrolling */
+[data-radix-select-viewport] {
+  scroll-behavior: smooth;
+}
+
+/* Improve hover styles for dropdown items */
+[data-radix-select-item]:hover {
+  background-color: hsl(var(--accent) / 0.1);
 } 
